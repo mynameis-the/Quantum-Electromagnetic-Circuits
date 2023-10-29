@@ -17,7 +17,12 @@ the capacitance connecting the nodes $r$ and $s$, and who's diagonal elements ar
 built in the same way as those of $\left\lbrack L^{-1}\right\rbrack_{jk}$.
 7. caveman use networkx api to generate spanning tree of capacitance sub-network
 in respect to some arbitrary "ground" node (should be specified by input circuit caveman).
-8. ooga booga program formula for potential energy:
+8. ooga booga program Hamiltonian formula:
 
-$$\varepsilon_{pot}=\frac12\vec{\phi^t}\left\lbrack L^{-1}\right\rbrack\vec{\phi}+\sum_{b}\frac{1}{L_{b}}\left(\phi_{n}-\phi_{n^{\prime}}\right)\tilde{\phi_b}$$
+$$\mathcal{H}=\varepsilon_{\text{kin}}+\varepsilon_{\text{pot}}$$
 
+$$\varepsilon_{\text{kin}}=\frac12\vec{\dot{\phi}}^{t}\left\lbrack C\right\rbrack\vec{\dot{\phi}}$$
+
+$$\varepsilon_{\text{pot}}=\frac12\vec{\phi^t}\left\lbrack L^{-1}\right\rbrack\vec{\phi}+\sum_{b}\frac{1}{L_{b}}\left(\phi_{n}-\phi_{n^{\prime}}\right)\tilde{\phi_b}$$
+
+9. Caveman brain plugs Hamilton's equations into sympy solver 
