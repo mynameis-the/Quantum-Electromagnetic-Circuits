@@ -4,7 +4,9 @@ import random
 import numpy as np
 import networkx as nx
 from dataclasses import dataclass, field
+import sympy
 from sympy import *
+from sympy.abc import t
 import matplotlib.pyplot as plt
 
 from components import Component, Capacitor, Inductor
@@ -15,19 +17,87 @@ class Circuit:
     graph: nx.Graph
     components: Optional[List[Component]] = None
 
-    def solve(self):  # caveman logic:
+    def solve(self, offset_flux: List[List[float]]=None):  # caveman logic
         # graph of nodes
         nodes = nx.line_graph(self.graph)
         # determine active nodes and passive nodes
         for n in nodes.nodes:
-            neighbors = nx.neighbors(nodes, n)
-            if len(set([type(self.components[i]) for i in neighbors])) > 1:
+            i = self.components[n[0]]
+            j = self.components[n[1]]
+            # amazing code, always do this
+            if i.capacitance != 0 and j.inductance !=0 or j.capacitance != 0 and i.inductance !=0:
                 # active node
                 nodes.nodes[n]["type"] = "active"
             else:
+                # passive node
                 nodes.nodes[n]["type"] = "passive"
+        p = len(nodes.nodes)
 
+        # construct L^-1
+        L_inverse = np.zeros((p, p))
+        print(nodes.nodes)
+        for n in nodes.nodes:
+            j, k = n
+            L_jk = self.components[j].inductance + self.components[j].inductance
+            if np.isclose(L_jk, 0):
+                L_inverse[j][k] = 0
+            else:
+                L_inverse[j][k] = -1/L_jk
+        """
+        for i in range(p):
+            # idc
+            L_inverse[i][i] = np.sum(L_inverse, axis=0)[i]
+        """
+        diagonal_values = np.sum(L_inverse, axis=0)
+        for i in range(p):
+            # idc
+            #L_inverse[i][i] = np.sum(L_inverse, axis=0)[i]
 
+            # i cared
+            L_inverse[i][i] = diagonal_values[i]
+        # surprise tool for later
+        #L= np.linalg.inv(L_inverse)
+
+        # construct C
+        C = np.zeros((p, p))
+        for n in nodes:
+            r, s = n
+            C_rs = self.components[r].capacitance - self.components[s].capacitance
+            C[r][s] = -C_rs
+        diagonal_values = np.sum(C, axis=0)
+        for i in range(p):
+            C[i][i] = diagonal_values[i]
+        # take ground node to be the 0th element
+        ground = 0
+        # eliminate ground rows and columns from matrices
+        L_inverse = np.delete(L_inverse, ground, axis=0)
+        L_inverse = np.delete(L_inverse, ground, axis=1)
+        C = np.delete(C, ground, axis=0)
+        C = np.delete(C, ground, axis=1)
+        # initialise hamiltonian variables
+        phi = sympy.Matrix([sympy.Function(f"phi_{i}")(t) for i in range(p-1)])
+        phi_dot = phi.diff(t)
+        offset_flux = offset_flux or np.zeros((p-1, p-1))
+        # (no idea what this bit does and the paper doesn't explain it)
+        josephson_doohickey = 0
+        for i, b in enumerate(nodes):
+            if nodes.nodes[b]["type"] == "passive":
+                j, k = b
+                #L_b =  L[j][k]
+                phi_squiggle_b = offset_flux[j][k]
+                #josephson_doohickey += 1/L_b*(phi[j]-phi[k])*phi_squiggle_b
+        # caveman brain write out formulae
+        print(sympy.Rational(1, 2)*phi.T*L_inverse*phi)
+        e_potential = (sympy.Rational(1, 2)*phi.T*L_inverse*phi)[0]+josephson_doohickey
+        e_kinetic = (sympy.Rational(1, 2)*phi_dot.T*C*phi_dot)[0]
+        print(e_potential)
+        print(e_kinetic)
+        LE = e_kinetic - e_potential
+        # solve lagrangian with hamilton's equations
+        print(sympy.Eq(Rational(1,2)*Symbol("m")*))
+        EL_eq = sympy.Eq(LE.diff(phi), LE.diff(phi_dot, t), evaluate=False)
+        print(EL_eq)
+        return sympy.dsolve(EL_eq)
 
     def draw_circuit(self, **kwargs):
         def color_map(graph):
@@ -70,6 +140,7 @@ class Circuit:
 
 
 if __name__ == "__main__":
-    circuit = Circuit.random_circuit(10)
+    circuit = Circuit.random_circuit(5)
+    print(circuit.solve())
     circuit.draw_circuit()
     plt.show()

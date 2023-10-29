@@ -14,6 +14,7 @@ class Capacitor(Component):
 
     def __post_init__(self):
         self.value = self.capacitance
+        self.inductance = 0  # idc
 
 
 @dataclass

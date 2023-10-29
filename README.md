@@ -5,7 +5,7 @@
 3. bash graph with rock to convert graph of components to graph of nodes, where
 active nodes are where inductances and capacitances meet, and passive nodes are
 where only capacitances or only inductances meet.
-4. enumerate graph nodes, where active nodes are 
+4. caveman enumerates graph nodes, where active nodes are 
 $1\ldots N$ and passive nodes are $N+1\ldots P$.
 5. Construct the (symmetric) $P\times P$ inverse inductance matrix $\left\lbrack L^{-1}\right\rbrack_{jk}$
 who's non-diagonal matrix elements are $-1\/L_{jk}$, where $L_{jk}$ is the value of
