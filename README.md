@@ -1,5 +1,6 @@
 # The General Idea
-## In Caveman Language
+implement the method of nodes for solving (symbolically) for flux (? don't know what it is) described in [this paper](https://arxiv.org/abs/1610.03438v2) (2.1.7).
+## Instructions In Caveman Language
 1. Cavman brain defines circuit components.
 2. Oooga booga assemble a circuit by putting components into a graph.
 3. bash graph with rock to convert graph of components to graph of nodes, where
@@ -27,4 +28,11 @@ $$\varepsilon_{\text{pot}}=\frac12\vec{\phi^t}\left\lbrack L^{-1}\right\rbrack\v
 
 9. Caveman brain plugs Hamilton's equations into sympy solver
 
-https://arxiv.org/abs/1610.03438
+# disclaimer
+This program solves an electrical circuit for its flux. 
+
+Don't use this. I don't know what a circuit is. I don't know what flux is, and i don't know what electricity is.
+
+I made this while mildly delirious from two vaccines in opposite arms, and it serves no purpose. There is probably going to be something wrong with it.
+
+It also can't solve big systems of differential equations (from circuits around n>5) symbolically because of sympy limitations.
