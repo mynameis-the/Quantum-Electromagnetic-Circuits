@@ -1,5 +1,5 @@
 # The General Idea
-implement the method of nodes for solving (symbolically) for flux (? don't know what it is) described in [this paper](https://arxiv.org/abs/1610.03438v2) (2.1.7).
+implement the method of nodes for symbolically solving for flux (? i don't know what it is) described in [this paper](https://arxiv.org/abs/1610.03438v2) (2.1.7).
 ## Instructions In Caveman Language
 1. Cavman brain defines circuit components.
 2. Oooga booga assemble a circuit by putting components into a graph.
