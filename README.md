@@ -25,4 +25,6 @@ $$\varepsilon_{\text{kin}}=\frac12\vec{\dot{\phi}}^{t}\left\lbrack C\right\rbrac
 
 $$\varepsilon_{\text{pot}}=\frac12\vec{\phi^t}\left\lbrack L^{-1}\right\rbrack\vec{\phi}+\sum_{b}\frac{1}{L_{b}}\left(\phi_{n}-\phi_{n^{\prime}}\right)\tilde{\phi_b}$$
 
-9. Caveman brain plugs Hamilton's equations into sympy solver 
+9. Caveman brain plugs Hamilton's equations into sympy solver
+
+https://arxiv.org/abs/1610.03438
