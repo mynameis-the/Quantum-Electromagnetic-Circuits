@@ -6,6 +6,7 @@ import networkx as nx
 from dataclasses import dataclass, field
 import sympy
 from sympy import *
+from sympy.physics.mechanics import *
 from sympy.abc import t
 import matplotlib.pyplot as plt
 
@@ -35,7 +36,6 @@ class Circuit:
 
         # construct L^-1
         L_inverse = np.zeros((p, p))
-        print(nodes.nodes)
         for n in nodes.nodes:
             j, k = n
             L_jk = self.components[j].inductance + self.components[j].inductance
@@ -77,7 +77,7 @@ class Circuit:
         # initialise hamiltonian variables
         phi = sympy.Matrix([sympy.Function(f"phi_{i}")(t) for i in range(p-1)])
         phi_dot = phi.diff(t)
-        offset_flux = offset_flux or np.zeros((p-1, p-1))
+        offset_flux = offset_flux or np.zeros((p, p))
         # (no idea what this bit does and the paper doesn't explain it)
         josephson_doohickey = 0
         for i, b in enumerate(nodes):
@@ -87,17 +87,15 @@ class Circuit:
                 phi_squiggle_b = offset_flux[j][k]
                 #josephson_doohickey += 1/L_b*(phi[j]-phi[k])*phi_squiggle_b
         # caveman brain write out formulae
-        print(sympy.Rational(1, 2)*phi.T*L_inverse*phi)
         e_potential = (sympy.Rational(1, 2)*phi.T*L_inverse*phi)[0]+josephson_doohickey
         e_kinetic = (sympy.Rational(1, 2)*phi_dot.T*C*phi_dot)[0]
-        print(e_potential)
-        print(e_kinetic)
         LE = e_kinetic - e_potential
-        # solve lagrangian with hamilton's equations
-        print(sympy.Eq(Rational(1,2)*Symbol("m")*))
-        EL_eq = sympy.Eq(LE.diff(phi), LE.diff(phi_dot, t), evaluate=False)
-        print(EL_eq)
-        return sympy.dsolve(EL_eq)
+        # solve lagrangian
+        LM = LagrangesMethod(LE, phi)
+        eq_matrix = LM.form_lagranges_equations()
+        if 0 in eq_matrix:
+            return eq_matrix
+        return dsolve(eq_matrix)
 
     def draw_circuit(self, **kwargs):
         def color_map(graph):
@@ -124,7 +122,7 @@ class Circuit:
                 components.append(c(random.randint(0, 10), random.randint(0, 10)))
         graph = nx.cycle_graph(n)
         max_edges = n * (n - 1) // 2
-        num_extra_edges = num_extra_edges or random.randint(0, max_edges)
+        num_extra_edges = num_extra_edges if num_extra_edges is not None else random.randint(0, max_edges)
         extra_edges = []
         while len(extra_edges) < num_extra_edges:
             edge = (random.randint(0, n - 1), random.randint(0, n - 1))
@@ -140,7 +138,10 @@ class Circuit:
 
 
 if __name__ == "__main__":
-    circuit = Circuit.random_circuit(5)
-    print(circuit.solve())
+    sympy.init_printing()
+    circuit = Circuit.random_circuit(3, num_extra_edges=0)
+    motion = circuit.solve()
+    for eq in motion:
+        print(eq)
     circuit.draw_circuit()
     plt.show()
